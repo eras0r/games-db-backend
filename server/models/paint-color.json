@@ -1,0 +1,27 @@
+{
+  "name": "PaintColor",
+  "plural": "paint-colors",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "range": {
+      "type": "string",
+      "required": true
+    },
+    "hexColor": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

@@ -35,5 +35,9 @@
   "PaintColor": {
     "dataSource": "mongoDb",
     "public": true
+  },
+  "Gamer": {
+    "dataSource": "mongoDb",
+    "public": true
   }
 }

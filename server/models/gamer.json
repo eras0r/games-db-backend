@@ -1,0 +1,20 @@
+{
+  "name": "Gamer",
+  "base": "User",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {},
+  "validations": [],
+  "relations": {
+    "paintColors": {
+      "type": "hasMany",
+      "model": "PaintColor",
+      "foreignKey": "",
+      "through": "PaintColorPosession"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

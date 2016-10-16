@@ -12,7 +12,7 @@
     "roles": {
       "type": "hasMany",
       "model": "Role",
-      "foreignKey": "princpialId",
+      "foreignKey": "principalId",
       "through": "RoleMapping",
       "keyThrough": "roleId"
     },

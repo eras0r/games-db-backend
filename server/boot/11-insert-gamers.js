@@ -13,6 +13,26 @@ module.exports = function (app, callback) {
   var Role = app.models.Role;
   var RoleMapping = app.models.RoleMapping;
 
+  // the gamers to be created
+  var gamers = [
+    {
+      gamer: {
+        username: 'eras0r',
+        email: 'eras0r@game-db.org',
+        password: 'game-db'
+      },
+      roles: ['ADMIN', 'GAMER', 'PAINTER']
+    },
+    {
+      gamer: {
+        username: 'shine',
+        email: 'shine@game-db.org',
+        password: 'game-db'
+      },
+      roles: ['GAMER', 'PAINTER']
+    }
+  ];
+
   app.dataSources.mongoDb.autoupdate(['Gamer', 'RoleMapping'], function (err) {
     if (err) {
       throw err;
@@ -34,108 +54,118 @@ module.exports = function (app, callback) {
   });
 
   /**
-   * Inserts the users master data.
+   * Loads and returns all roles from the database.
+   * @returns {*|promise} promise containing all roles stored within the database.
    */
-  function insertGamers() {
+  function loadRolesFromDb() {
+    log.info('Loading roles from database');
+    var deferred = Q.defer();
 
-    // the gamers to be created
-    var gamers = [
-      {
-        gamer: {
-          username: 'eras0r',
-          email: 'eras0r@game-db.org',
-          password: 'game-db'
-        },
-        roles: ['ADMIN', 'GAMER', 'PAINTER']
-      },
-      {
-        gamer: {
-          username: 'shine',
-          email: 'shine@game-db.org',
-          password: 'game-db'
-        },
-        roles: ['GAMER', 'PAINTER']
-      }
-    ];
-
-    // load all roles
-    // Role.find({where: {name: {inq: gamer.roles}}}, function (err, roles) {
-    Role.find({}, function (err, roles) {
+    Role.find(function (err, roles) {
       if (err) {
         log.error('error:', err);
         throw err;
       }
-      log.info('db roles: ' + roles);
-      var dbRoles = roles;
 
-      // create gamers
-      var gamerPromises = [];
-      gamers.forEach(function (gamer) {
-        // create and add a new promise
-        var gamerDeferred = Q.defer();
-        gamerPromises.push(gamerDeferred.promise);
+      log.debug('Roles loaded from database: %s', _.map(roles, 'name'));
 
-        log.info('Creating Gamer with username: "%s"', gamer.gamer.username);
+      deferred.resolve(roles);
+    });
 
-        log.debug('db role: %j', dbRoles);
-        // filter out the desired gamer roles from all available roles
-        var gamerDbRoles = _.filter(dbRoles, function (dbRole) {
-          return _.includes(gamer.roles, dbRole.name);
-        });
+    return deferred.promise;
+  }
 
-        log.debug('the following gamer will be added for user "%s": %j', gamer.gamer.username, gamerDbRoles);
+  /**
+   * Inserts a single gamer within the databse
+   * @returns {*|promise}
+   */
+  function insertGamer(gamer, roles, dbRoles) {
+    log.info('Creating Gamer with username: "%s"', gamer.username);
 
-        Gamer.create(gamer.gamer, function (err, createdGamer) {
-          if (err) {
-            throw err;
-          }
+    var gamerDeferred = Q.defer();
 
-          // create role mappings
-          var rolePromises = [];
-          gamerDbRoles.forEach(function (gamerRole) {
-            // create and add a new promise
-            var roleDeferred = Q.defer();
-            rolePromises.push(roleDeferred.promise);
+    Gamer.create(gamer, function (err, createdGamer) {
+      if (err) {
+        throw err;
+      }
 
-            gamerRole.principals.create({
-              principalType: RoleMapping.USER,
-              principalId: createdGamer.id
-            }, function (err, principal) {
-              if (err) {
-                throw err;
-              }
-
-              roleDeferred.resolve(principal);
-            });
-          });
-
-          // wait until all role mapping have been created
-          Q.all(rolePromises)
-            .then(function (results) {
-              gamerDeferred.resolve(createdGamer);
-              log.info('Gamer with id="%s" and username="%s" has been created.',
-                createdGamer.id.toString(), createdGamer.username);
-            })
-            .catch(function (error) {
-              log.error('Error adding user roles', error);
-              gamerDeferred.reject(error);
-            });
-        });
-
+      // filter out the desired gamer roles from all available roles
+      var gamerDbRoles = _.filter(dbRoles, function (dbRole) {
+        return _.includes(roles, dbRole.name);
       });
 
-      // wait until all gamers have been created
-      Q.all(gamerPromises)
-        .then(function (results) {
-          log.info('Number of Gamers created: %d', gamers.length);
+      // create role mappings
+      var rolePromises = [];
+      gamerDbRoles.forEach(function (gamerRole) {
+        rolePromises.push(insertRoleMapping(createdGamer, gamerRole));
+      });
 
-          endScript(callback);
+      // wait until all role mapping have been created
+      Q.all(rolePromises)
+        .then(function (results) {
+          gamerDeferred.resolve(createdGamer);
+          log.info('Gamer with id="%s" and username="%s" has been created.',
+            createdGamer.id.toString(), createdGamer.username);
         })
         .catch(function (error) {
-          log.error('Error creating master data Gamers', error);
+          log.error('Error adding user roles', error);
+          gamerDeferred.reject(error);
+        });
+    });
+
+    return gamerDeferred.promise;
+  }
+
+  /**
+   * Creates a role mapping for the given gamer and role
+   * @param gamer the gamer
+   * @param role the role
+   * @returns {*|promise} promise containing the created role mapping
+   */
+  function insertRoleMapping(gamer, role) {
+    log.info('Creating role mapping for gamer="%s" and role="%s"', gamer.username, role.name);
+    var roleDeferred = Q.defer();
+
+    role.principals.create({
+      principalType: RoleMapping.USER,
+      principalId: gamer.id
+    }, function (err, principal) {
+      if (err) {
+        throw err;
+      }
+
+      roleDeferred.resolve(principal);
+    });
+
+    return roleDeferred.promise;
+  }
+
+  /**
+   * Inserts the users master data.
+   */
+  function insertGamers() {
+    loadRolesFromDb()
+      .then(function (dbRoles) {
+        // create gamers
+        var gamerPromises = [];
+        gamers.forEach(function (gamer) {
+          gamerPromises.push(insertGamer(gamer.gamer, gamer.roles, dbRoles));
         });
 
-    });
+        // wait until all gamers have been created
+        Q.all(gamerPromises)
+          .then(function (results) {
+            log.info('Number of Gamers created: %d', gamers.length);
+
+            endScript(callback);
+          })
+          .catch(function (error) {
+            log.error('Error creating master data Gamers', error);
+          });
+      })
+      .catch(function (error) {
+        log.error('Unable to load roles from database: ', error);
+      });
   }
 
   function endScript(callback) {

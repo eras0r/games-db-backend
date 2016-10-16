@@ -54,6 +54,33 @@ module.exports = function (app, callback) {
   });
 
   /**
+   * Inserts the gamers master data.
+   */
+  function insertGamers() {
+    loadRolesFromDb()
+      .then(function (dbRoles) {
+        // create gamers
+        var gamerPromises = [];
+        gamers.forEach(function (gamer) {
+          gamerPromises.push(insertGamer(gamer.gamer, gamer.roles, dbRoles));
+        });
+
+        // wait until all gamers have been created
+        Q.all(gamerPromises)
+          .then(function (results) {
+            log.info('Number of Gamers created: %d', gamers.length);
+            endScript(callback);
+          })
+          .catch(function (error) {
+            log.error('Error creating master data Gamers', error);
+          });
+      })
+      .catch(function (error) {
+        log.error('Unable to load roles from database: ', error);
+      });
+  }
+
+  /**
    * Loads and returns all roles from the database.
    * @returns {*|promise} promise containing all roles stored within the database.
    */
@@ -138,34 +165,6 @@ module.exports = function (app, callback) {
     });
 
     return roleDeferred.promise;
-  }
-
-  /**
-   * Inserts the users master data.
-   */
-  function insertGamers() {
-    loadRolesFromDb()
-      .then(function (dbRoles) {
-        // create gamers
-        var gamerPromises = [];
-        gamers.forEach(function (gamer) {
-          gamerPromises.push(insertGamer(gamer.gamer, gamer.roles, dbRoles));
-        });
-
-        // wait until all gamers have been created
-        Q.all(gamerPromises)
-          .then(function (results) {
-            log.info('Number of Gamers created: %d', gamers.length);
-
-            endScript(callback);
-          })
-          .catch(function (error) {
-            log.error('Error creating master data Gamers', error);
-          });
-      })
-      .catch(function (error) {
-        log.error('Unable to load roles from database: ', error);
-      });
   }
 
   function endScript(callback) {

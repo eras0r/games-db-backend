@@ -29,6 +29,7 @@ module.exports = function (app, callback) {
       }
       else {
         log.info('Gamers are already present. No need to insert Gamer master data.');
+        endScript(callback);
       }
     });
 

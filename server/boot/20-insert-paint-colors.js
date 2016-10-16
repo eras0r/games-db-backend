@@ -25,6 +25,7 @@ module.exports = function (app, callback) {
       }
       else {
         log.info('PaintColors are already present. No need to insert PaintColor master data.');
+        endScript(callback);
       }
     });
 

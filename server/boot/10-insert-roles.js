@@ -23,6 +23,7 @@ module.exports = function (app, callback) {
       }
       else {
         log.info('Roles are already present. No need to insert Role master data.');
+        endScript(callback);
       }
     });
 
@@ -42,11 +43,14 @@ module.exports = function (app, callback) {
       }
 
       log.info('Number of Roles created: %d', Object.keys(roles).length);
-
-      log.info('--- boot script "10-insert-roles"  ended ---- ');
-      // invoke async bootscript callback function
-      callback();
+      endScript(callback);
     });
+  }
+
+  function endScript(callback) {
+    log.info('--- boot script "10-insert-roles"  ended ---- ');
+    // invoke async bootscript callback function
+    callback();
   }
 
 };

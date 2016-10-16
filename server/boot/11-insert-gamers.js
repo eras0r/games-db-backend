@@ -4,6 +4,7 @@ var Q = require('q');
 var _ = require('lodash');
 
 var log = require('./../middleware/logger');
+var gamers = require('../master-data/gamers.json');
 
 module.exports = function (app, callback) {
 
@@ -12,26 +13,6 @@ module.exports = function (app, callback) {
   var Gamer = app.models.Gamer;
   var Role = app.models.Role;
   var RoleMapping = app.models.RoleMapping;
-
-  // the gamers to be created
-  var gamers = [
-    {
-      gamer: {
-        username: 'eras0r',
-        email: 'eras0r@game-db.org',
-        password: 'game-db'
-      },
-      roles: ['ADMIN', 'GAMER', 'PAINTER']
-    },
-    {
-      gamer: {
-        username: 'shine',
-        email: 'shine@game-db.org',
-        password: 'game-db'
-      },
-      roles: ['GAMER', 'PAINTER']
-    }
-  ];
 
   app.dataSources.mongoDb.autoupdate(['Gamer', 'RoleMapping'], function (err) {
     if (err) {

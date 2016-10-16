@@ -1,0 +1,25 @@
+[
+  {
+    "gamer": {
+      "username": "eras0r",
+      "email": "eras0r@game-db.org",
+      "password": "game-db"
+    },
+    "roles": [
+      "ADMIN",
+      "GAMER",
+      "PAINTER"
+    ]
+  },
+  {
+    "gamer": {
+      "username": "shine",
+      "email": "shine@game-db.org",
+      "password": "game-db"
+    },
+    "roles": [
+      "GAMER",
+      "PAINTER"
+    ]
+  }
+]

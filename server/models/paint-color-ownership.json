@@ -1,0 +1,24 @@
+{
+  "name": "PaintColorOwnership",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {},
+  "validations": [],
+  "relations": {
+    "owner": {
+      "type": "belongsTo",
+      "model": "Gamer",
+      "foreignKey": ""
+    },
+    "paintColor": {
+      "type": "belongsTo",
+      "model": "PaintColor",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

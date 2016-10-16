@@ -15,6 +15,12 @@
       "foreignKey": "princpialId",
       "through": "RoleMapping",
       "keyThrough": "roleId"
+    },
+    "paintColors": {
+      "type": "hasMany",
+      "model": "PaintColor",
+      "foreignKey": "ownerId",
+      "through": "PaintColorOwnership"
     }
   },
   "acls": [],

@@ -1,5 +1,6 @@
 {
   "name": "Gamer",
+  "plural": "gamers",
   "base": "User",
   "idInjection": true,
   "options": {
@@ -8,11 +9,12 @@
   "properties": {},
   "validations": [],
   "relations": {
-    "paintColors": {
+    "roles": {
       "type": "hasMany",
-      "model": "PaintColor",
-      "foreignKey": "",
-      "through": "PaintColorPosession"
+      "model": "Role",
+      "foreignKey": "princpialId",
+      "through": "RoleMapping",
+      "keyThrough": "roleId"
     }
   },
   "acls": [],

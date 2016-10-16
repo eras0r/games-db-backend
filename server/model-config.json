@@ -14,7 +14,8 @@
     ]
   },
   "User": {
-    "dataSource": "db"
+    "dataSource": "db",
+    "public": false
   },
   "AccessToken": {
     "dataSource": "db",
@@ -25,11 +26,11 @@
     "public": false
   },
   "RoleMapping": {
-    "dataSource": "db",
+    "dataSource": "mongoDb",
     "public": false
   },
   "Role": {
-    "dataSource": "db",
+    "dataSource": "mongoDb",
     "public": false
   },
   "PaintColor": {

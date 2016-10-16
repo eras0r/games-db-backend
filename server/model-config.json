@@ -40,5 +40,9 @@
   "Gamer": {
     "dataSource": "mongoDb",
     "public": true
+  },
+  "PaintColorOwnership": {
+    "dataSource": "mongoDb",
+    "public": false
   }
 }

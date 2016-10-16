@@ -13,8 +13,7 @@ module.exports = function (app, callback) {
   var Role = app.models.Role;
   var RoleMapping = app.models.RoleMapping;
 
-  // TODO change to autouodate
-  app.dataSources.mongoDb.automigrate(['Gamer', 'RoleMapping'], function (err) {
+  app.dataSources.mongoDb.autoupdate(['Gamer', 'RoleMapping'], function (err) {
     if (err) {
       throw err;
     }

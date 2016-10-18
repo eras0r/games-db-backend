@@ -14,9 +14,9 @@ module.exports = function (Gamer) {
   restEndpointConfigurer.allowDefaultCrudMethodsOnlyForRelation(Gamer, 'roles');
 
   // user specific stuff (login, logout, etc.)
-  Gamer.disableRemoteMethod('confirm', true); // GET /gamers/confirm
-  Gamer.disableRemoteMethod('login', true); // POST /gamers/login
-  Gamer.disableRemoteMethod('logout', true); // POST /gamers/logout
-  Gamer.disableRemoteMethod('resetPassword', true); // POST /gamers/reset
+  // Gamer.disableRemoteMethod('confirm', true); // GET /gamers/confirm
+  // Gamer.disableRemoteMethod('login', true); // POST /gamers/login
+  // Gamer.disableRemoteMethod('logout', true); // POST /gamers/logout
+  // Gamer.disableRemoteMethod('resetPassword', true); // POST /gamers/reset
 
 };
